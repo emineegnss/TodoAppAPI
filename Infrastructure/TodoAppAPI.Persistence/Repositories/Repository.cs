@@ -3,6 +3,7 @@ using TodoAppAPI.Application.Repositories;
 using TodoAppAPI.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace TodoAppAPI.Persistence.Repositories
 {
@@ -22,6 +23,11 @@ namespace TodoAppAPI.Persistence.Repositories
         }
 
         public IQueryable<T> GetAll() => Table;
+
+        public async Task<T> GetByIdAsync(int id)
+        {
+            return await Table.FirstOrDefaultAsync(data => data.Id == id);
+        }
 
         public async Task<bool> Remove(int id)
         {

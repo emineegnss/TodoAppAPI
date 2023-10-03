@@ -14,18 +14,19 @@ namespace TodoAppAPI.API.Controllers
         private readonly IDoneRepository _doneRepository;
         private readonly IInProgressRepository _inProgressRepository;
         private readonly IPendingRepository _pendingRepository;
+        private readonly IRepository<BaseEntity> _repository;
 
-        public TodosController(IDoneRepository doneRepository, IPendingRepository pendingRepository, IInProgressRepository inProgressRepository)
+        public TodosController(IDoneRepository doneRepository, IPendingRepository pendingRepository, IInProgressRepository inProgressRepository, IRepository<BaseEntity> repository)
         {
             _doneRepository = doneRepository;
             _pendingRepository = pendingRepository;
             _inProgressRepository = inProgressRepository;
+            _repository = repository;
         }
         [HttpGet]
         public async Task<IActionResult> Get()
         {
            
-            await _doneRepository.SaveAsync();
             var doneItems = _doneRepository.GetAll();
             var inProgressItems = _inProgressRepository.GetAll();
             var pendingItems = _pendingRepository.GetAll();
@@ -38,16 +39,24 @@ namespace TodoAppAPI.API.Controllers
 
             return Ok(result);
         }
-        [HttpPost("done")]
-        public async Task<IActionResult> Add(Done done)
+        [HttpPost("todo")]
+        public async Task<IActionResult> Add(Pending pending)
         {
-            await _doneRepository.AddAsync(done);
-            await _doneRepository.SaveAsync();
-            return Ok("Todo Başarılı Eklendi");
+           var result=  await _pendingRepository.AddAsync(pending);
+            await _pendingRepository.SaveAsync();
+            return Ok(result);
 
         }
-        
-        
+        [HttpPut("update")]
+        public async Task<IActionResult> Put(BaseEntity entity)
+        {
+            var result = _repository.Update(entity);
+            
+            return Ok(result);
+        }
+
+
+
 
     }
 }
